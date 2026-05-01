@@ -1,5 +1,5 @@
 ; ============================================================
-;  REI GOKIL - FINAL WORKING (NO GUI ERROR)
+;  REI GOKIL - FINAL WORKING (FIXED FUNCTIONS)
 ;  https://github.com/reihhd/AA
 ; ============================================================
 
@@ -26,38 +26,47 @@ global UseE := false
 global UseClick := false
 
 ; ============================================================
-; FUNGSI CHECKBOX
+; FUNGSI CHECKBOX (PERBAIKAN: global lalu assign terpisah)
 ; ============================================================
 SetUseZ(ctrl, info) {
-    global UseZ := ctrl.Value
+    global UseZ
+    UseZ := ctrl.Value
 }
 SetUseX(ctrl, info) {
-    global UseX := ctrl.Value
+    global UseX
+    UseX := ctrl.Value
 }
 SetUseC(ctrl, info) {
-    global UseC := ctrl.Value
+    global UseC
+    UseC := ctrl.Value
 }
 SetUseV(ctrl, info) {
-    global UseV := ctrl.Value
+    global UseV
+    UseV := ctrl.Value
 }
 SetUseG(ctrl, info) {
-    global UseG := ctrl.Value
+    global UseG
+    UseG := ctrl.Value
 }
 SetUseS(ctrl, info) {
-    global UseS := ctrl.Value
+    global UseS
+    UseS := ctrl.Value
 }
 SetUseF(ctrl, info) {
-    global UseF := ctrl.Value
+    global UseF
+    UseF := ctrl.Value
 }
 SetUseE(ctrl, info) {
-    global UseE := ctrl.Value
+    global UseE
+    UseE := ctrl.Value
 }
 SetUseClick(ctrl, info) {
-    global UseClick := ctrl.Value
+    global UseClick
+    UseClick := ctrl.Value
 }
 
 ; ============================================================
-; GUI (GUNAKAN NAMA VARIABEL MyGui)
+; GUI (GUNAKAN MyGui)
 ; ============================================================
 MyGui := Gui("+AlwaysOnTop -DPIScale", "Rei Gokil")
 MyGui.BackColor := "0A0A0F"
@@ -104,8 +113,8 @@ CbClick.OnEvent("Click", SetUseClick)
 ; Delay controls
 MyGui.SetFont("s8 c888888", "Segoe UI")
 MyGui.Add("Text", "x20 y176", "DELAY")
-global SkillDelayEdit := MyGui.Add("Edit", "x70 y173 w50 h20 Center", "100")
-MyGui.Add("UpDown", "Range10-500", 100)
+global SkillDelayEdit := MyGui.Add("Edit", "x70 y173 w50 h20 Center", "10")
+MyGui.Add("UpDown", "Range1-500", 10)
 MyGui.Add("Text", "x135 y176", "ms")
 MyGui.Add("Text", "x190 y176", "LOOP")
 global CycleDelayEdit := MyGui.Add("Edit", "x235 y173 w50 h20 Center", "100")
@@ -126,7 +135,7 @@ ToggleBtn.OnEvent("Click", ToggleMacro)
 ; Footer
 MyGui.Add("Text", "x0 y292 w340 h1 Background00CCFF")
 MyGui.SetFont("s7 c555555", "Segoe UI")
-MyGui.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  v1.0.0")
+MyGui.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  auto update")
 
 MyGui.OnEvent("Close", (*) => ExitApp())
 MyGui.Show("w340 h320")
@@ -204,10 +213,8 @@ ToggleMacro(ctrl := unset, info := unset) {
         SkillDelay := Integer(SkillDelayEdit.Value)
         CycleDelay := Integer(CycleDelayEdit.Value)
 
-        if SkillDelay < 50 {
-            SkillDelay := 50
-            SkillDelayEdit.Value := 50
-        }
+        if SkillDelay < 1
+            SkillDelay := 1
         if CycleDelay < 10
             CycleDelay := 10
 
