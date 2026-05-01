@@ -1,5 +1,5 @@
 ; ============================================================
-;  REI GOKIL - FINAL WORKING (FUNGSI DIPERBAIKI)
+;  REI GOKIL - MAIN SCRIPT (WORKING)
 ;  https://github.com/reihhd/AA
 ; ============================================================
 
@@ -7,80 +7,26 @@
 #SingleInstance Force
 
 ; ============================================================
-; AUTO-UPDATE (DENGAN BATCH FILE SEDERHANA)
-; ============================================================
-global GITHUB_RAW := "https://raw.githubusercontent.com/reihhd/AA/refs/heads/main/"
-
-CheckForUpdates() {
-    local versionUrl := GITHUB_RAW . "version.txt"
-    local scriptUrl  := GITHUB_RAW . "ReiGokil.ahk"
-    local localVersionFile := A_ScriptDir "\version_local.txt"
-    local tempVersion := A_Temp "\rei_version.txt"
-    local tempScript  := A_Temp "\rei_new.ahk"
-    
-    ; Download version.txt
-    try {
-        Download(versionUrl, tempVersion)
-        local newVersion := Trim(FileRead(tempVersion, "UTF-8"))
-    } catch {
-        return
-    }
-    
-    ; Baca versi lokal
-    local currentVersion := ""
-    if FileExist(localVersionFile)
-        currentVersion := Trim(FileRead(localVersionFile, "UTF-8"))
-    
-    ; Update jika beda
-    if (newVersion != currentVersion) {
-        try {
-            Download(scriptUrl, tempScript)
-            if !FileExist(tempScript)
-                return
-        } catch {
-            return
-        }
-        
-        ; Buat batch file untuk update (lebih aman daripada cmd /c panjang)
-        local batFile := A_Temp "\rei_update.bat"
-        local batContent := '@echo off' "`n"
-        batContent .= 'timeout /t 1 /nobreak >nul' "`n"
-        batContent .= 'del /f /q "' A_ScriptFullPath '" 2>nul' "`n"
-        batContent .= 'copy /y "' tempScript '" "' A_ScriptFullPath '"' "`n"
-        batContent .= 'echo ' newVersion ' > "' localVersionFile '"' "`n"
-        batContent .= 'start "" "' A_ScriptFullPath '"' "`n"
-        batContent .= 'del "' tempScript '" 2>nul' "`n"
-        batContent .= 'del "' batFile '" 2>nul'
-        
-        FileAppend(batContent, batFile, "UTF-8")
-        Run batFile, , "Hide"
-        ExitApp()
-    }
-}
-if !A_IsCompiled
-    CheckForUpdates()
-
-; ============================================================
 ; VARIABLES
 ; ============================================================
-global MacroActive  := false
-global ToggleKey    := "F1"
-global IsSettingKey := false
-global SkillDelay   := 100
-global CycleDelay   := 100
+MacroActive := false
+ToggleKey := "F1"
+IsSettingKey := false
+SkillDelay := 100
+CycleDelay := 100
 
-global UseZ := false
-global UseX := false
-global UseC := false
-global UseV := false
-global UseG := false
-global UseS := false
-global UseF := false
-global UseE := false
-global UseClick := false
+UseZ := false
+UseX := false
+UseC := false
+UseV := false
+UseG := false
+UseS := false
+UseF := false
+UseE := false
+UseClick := false
 
 ; ============================================================
-; FUNGSI CHECKBOX (DITULIS EKSPLISIT)
+; FUNGSI CHECKBOX
 ; ============================================================
 SetUseZ(ctrl, info) {
     global UseZ
@@ -120,18 +66,19 @@ SetUseClick(ctrl, info) {
 }
 
 ; ============================================================
-; GUI MINIMALIS
+; GUI
 ; ============================================================
-gui := Gui("+AlwaysOnTop -DPIScale", "Rei Gokil")
-gui.BackColor := "0A0A0F"
-gui.SetFont("s10 cEEEEEE", "Segoe UI")
+MyGui := Gui("+AlwaysOnTop -DPIScale", "Rei Gokil")
+MyGui.BackColor := "0A0A0F"
+MyGui.SetFont("s10 cEEEEEE", "Segoe UI")
 
-gui.Add("Progress", "x0 y0 w340 h1 Background00CCFF Range0-100", 100)
-gui.SetFont("s13 cFFFFFF Bold", "Segoe UI")
-gui.Add("Text", "x20 y16", "REI GOKIL")
-gui.SetFont("s8 cAAAAAA", "Segoe UI")
-statusTxt := gui.Add("Text", "x220 y20 w100 h28 +0x200 Background151520 Center", "STANDBY")
-gui.Add("Text", "x0 y50 w340 h1 Background1A1A2A")
+; Header
+MyGui.Add("Progress", "x0 y0 w340 h1 Background00CCFF Range0-100", 100)
+MyGui.SetFont("s13 cFFFFFF Bold", "Segoe UI")
+MyGui.Add("Text", "x20 y16", "REI GOKIL")
+MyGui.SetFont("s8 cAAAAAA", "Segoe UI")
+StatusTxt := MyGui.Add("Text", "x220 y20 w100 h28 +0x200 Background151520 Center", "STANDBY")
+MyGui.Add("Text", "x0 y50 w340 h1 Background1A1A2A")
 
 ; Checkbox grid
 cbWidth := 80
@@ -141,19 +88,19 @@ x3 := 225
 yStart := 70
 rowH := 32
 
-gui.SetFont("s10 cDDDDDD", "Segoe UI")
-cbZ := gui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart, cbWidth), "Z")
-cbX := gui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart, cbWidth), "X")
-cbC := gui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart, cbWidth), "C")
-cbV := gui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH, cbWidth), "V")
-cbG := gui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH, cbWidth), "G")
-cbS := gui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH, cbWidth), "S")
-gui.SetFont("s10 cFFAA44", "Segoe UI")
-cbF := gui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH*2, cbWidth), "F")
-gui.SetFont("s10 c66FF66", "Segoe UI")
-cbE := gui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH*2, cbWidth), "E")
-gui.SetFont("s10 c66AAFF", "Segoe UI")
-cbClick := gui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH*2, cbWidth), "CLICK")
+MyGui.SetFont("s10 cDDDDDD", "Segoe UI")
+cbZ := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart, cbWidth), "Z")
+cbX := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart, cbWidth), "X")
+cbC := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart, cbWidth), "C")
+cbV := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH, cbWidth), "V")
+cbG := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH, cbWidth), "G")
+cbS := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH, cbWidth), "S")
+MyGui.SetFont("s10 cFFAA44", "Segoe UI")
+cbF := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH*2, cbWidth), "F")
+MyGui.SetFont("s10 c66FF66", "Segoe UI")
+cbE := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH*2, cbWidth), "E")
+MyGui.SetFont("s10 c66AAFF", "Segoe UI")
+cbClick := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH*2, cbWidth), "CLICK")
 
 ; Events
 cbZ.OnEvent("Click", SetUseZ)
@@ -167,34 +114,34 @@ cbE.OnEvent("Click", SetUseE)
 cbClick.OnEvent("Click", SetUseClick)
 
 ; Delay controls
-gui.SetFont("s8 c888888", "Segoe UI")
-gui.Add("Text", "x20 y176", "DELAY")
-skillDelayEdit := gui.Add("Edit", "x70 y173 w50 h20 Center", "100")
-gui.Add("UpDown", "Range10-500", 100)
-gui.Add("Text", "x135 y176", "ms")
-gui.Add("Text", "x190 y176", "LOOP")
-cycleDelayEdit := gui.Add("Edit", "x235 y173 w50 h20 Center", "100")
-gui.Add("UpDown", "Range10-5000", 100)
-gui.Add("Text", "x295 y176", "ms")
+MyGui.SetFont("s8 c888888", "Segoe UI")
+MyGui.Add("Text", "x20 y176", "DELAY")
+SkillDelayEdit := MyGui.Add("Edit", "x70 y173 w50 h20 Center", "100")
+MyGui.Add("UpDown", "Range10-500", 100)
+MyGui.Add("Text", "x135 y176", "ms")
+MyGui.Add("Text", "x190 y176", "LOOP")
+CycleDelayEdit := MyGui.Add("Edit", "x235 y173 w50 h20 Center", "100")
+MyGui.Add("UpDown", "Range10-5000", 100)
+MyGui.Add("Text", "x295 y176", "ms")
 
 ; Hotkey setter
-gui.Add("Text", "x20 y208", "TOGGLE")
-keyLabel := gui.Add("Text", "x80 y205 w60 h22 +0x200 Background151520 Center", "F1")
-setKeyBtn := gui.Add("Button", "x150 y205 w60 h22", "SET")
-setKeyBtn.OnEvent("Click", SetToggleKey)
+MyGui.Add("Text", "x20 y208", "TOGGLE")
+KeyLabel := MyGui.Add("Text", "x80 y205 w60 h22 +0x200 Background151520 Center", "F1")
+SetKeyBtn := MyGui.Add("Button", "x150 y205 w60 h22", "SET")
+SetKeyBtn.OnEvent("Click", SetToggleKey)
 
 ; Start/Stop button
-gui.SetFont("s10 cFFFFFF Bold", "Segoe UI")
-toggleBtn := gui.Add("Button", "x20 y245 w300 h32", ">>  START  [ F1 ]")
-toggleBtn.OnEvent("Click", ToggleMacro)
+MyGui.SetFont("s10 cFFFFFF Bold", "Segoe UI")
+ToggleBtn := MyGui.Add("Button", "x20 y245 w300 h32", ">>  START  [ F1 ]")
+ToggleBtn.OnEvent("Click", ToggleMacro)
 
 ; Footer
-gui.Add("Text", "x0 y292 w340 h1 Background00CCFF")
-gui.SetFont("s7 c555555", "Segoe UI")
-gui.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  auto update")
+MyGui.Add("Text", "x0 y292 w340 h1 Background00CCFF")
+MyGui.SetFont("s7 c555555", "Segoe UI")
+MyGui.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  loader based")
 
-gui.OnEvent("Close", (*) => ExitApp())
-gui.Show("w340 h320")
+MyGui.OnEvent("Close", (*) => ExitApp())
+MyGui.Show("w340 h320")
 
 ; ============================================================
 ; HOTKEY
@@ -202,24 +149,24 @@ gui.Show("w340 h320")
 HotKey(ToggleKey, (*) => ToggleMacro())
 
 ; ============================================================
-; FUNGSI LAINNYA
+; FUNGSI LAIN
 ; ============================================================
 SetToggleKey(ctrl, info) {
-    global IsSettingKey, ToggleKey, keyLabel, setKeyBtn
+    global IsSettingKey, ToggleKey, KeyLabel, SetKeyBtn
     if IsSettingKey {
         IsSettingKey := false
-        keyLabel.Text := ToggleKey
-        setKeyBtn.Text := "SET"
+        KeyLabel.Text := ToggleKey
+        SetKeyBtn.Text := "SET"
         return
     }
     IsSettingKey := true
-    keyLabel.Text := "..."
-    setKeyBtn.Text := "CANCEL"
+    KeyLabel.Text := "..."
+    SetKeyBtn.Text := "CANCEL"
     SetTimer(WaitForKey, 50)
 }
 
 WaitForKey() {
-    global IsSettingKey, ToggleKey, MacroActive, keyLabel, setKeyBtn, toggleBtn
+    global IsSettingKey, ToggleKey, MacroActive, KeyLabel, SetKeyBtn, ToggleBtn
     if !IsSettingKey {
         SetTimer(, 0)
         return
@@ -240,10 +187,10 @@ WaitForKey() {
                 try HotKey(ToggleKey, (*) => ToggleMacro(), "Off")
                 ToggleKey := kName
                 HotKey(ToggleKey, (*) => ToggleMacro())
-                keyLabel.Text := kName
-                setKeyBtn.Text := "SET"
+                KeyLabel.Text := kName
+                SetKeyBtn.Text := "SET"
                 IsSettingKey := false
-                toggleBtn.Text := MacroActive ? "||  STOP  [ " kName " ]" : ">>  START  [ " kName " ]"
+                ToggleBtn.Text := MacroActive ? "||  STOP  [ " kName " ]" : ">>  START  [ " kName " ]"
                 return
             }
         }
@@ -253,12 +200,12 @@ WaitForKey() {
 ToggleMacro(ctrl := unset, info := unset) {
     global MacroActive, SkillDelay, CycleDelay, IsSettingKey
     global UseZ,UseX,UseC,UseV,UseG,UseS,UseF,UseE,UseClick
-    global skillDelayEdit, cycleDelayEdit, statusTxt, toggleBtn, ToggleKey, keyLabel, setKeyBtn
+    global SkillDelayEdit, CycleDelayEdit, StatusTxt, ToggleBtn, ToggleKey, KeyLabel, SetKeyBtn
 
     if IsSettingKey {
         IsSettingKey := false
-        keyLabel.Text := ToggleKey
-        setKeyBtn.Text := "SET"
+        KeyLabel.Text := ToggleKey
+        SetKeyBtn.Text := "SET"
         SetTimer(, 0)
         return
     }
@@ -266,12 +213,12 @@ ToggleMacro(ctrl := unset, info := unset) {
     MacroActive := !MacroActive
 
     if MacroActive {
-        SkillDelay := Integer(skillDelayEdit.Value)
-        CycleDelay := Integer(cycleDelayEdit.Value)
+        SkillDelay := Integer(SkillDelayEdit.Value)
+        CycleDelay := Integer(CycleDelayEdit.Value)
 
         if SkillDelay < 50 {
             SkillDelay := 50
-            skillDelayEdit.Value := 50
+            SkillDelayEdit.Value := 50
         }
         if CycleDelay < 10
             CycleDelay := 10
@@ -282,14 +229,14 @@ ToggleMacro(ctrl := unset, info := unset) {
             return
         }
 
-        statusTxt.Text := "ACTIVE"
-        statusTxt.SetFont("c00FFAA")
-        toggleBtn.Text := "||  STOP  [ " ToggleKey " ]"
+        StatusTxt.Text := "ACTIVE"
+        StatusTxt.SetFont("c00FFAA")
+        ToggleBtn.Text := "||  STOP  [ " ToggleKey " ]"
         SetTimer(MacroLoop, 50)
     } else {
-        statusTxt.Text := "STANDBY"
-        statusTxt.SetFont("cAAAAAA")
-        toggleBtn.Text := ">>  START  [ " ToggleKey " ]"
+        StatusTxt.Text := "STANDBY"
+        StatusTxt.SetFont("cAAAAAA")
+        ToggleBtn.Text := ">>  START  [ " ToggleKey " ]"
         SetTimer(MacroLoop, 0)
     }
 }
