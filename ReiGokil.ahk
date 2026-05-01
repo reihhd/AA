@@ -1,13 +1,76 @@
 ; ============================================================
-;  REI GOKIL - MINIMALIS ELEGAN (FIXED)
+;  REI GOKIL - MINIMALIS + AUTO UPDATE
 ;  AutoHotkey v2
+;  https://github.com/reihhd/AA
 ; ============================================================
 
 #SingleInstance Force
 #Requires AutoHotkey v2.0
 
 ; ============================================================
-; VARIABLES
+; AUTO-UPDATE (CEPAT & AMAN)
+; ============================================================
+
+global GITHUB_RAW := "https://raw.githubusercontent.com/reihhd/AA/refs/heads/main/"
+
+CheckForUpdates() {
+    local versionUrl := GITHUB_RAW . "version.txt"
+    local scriptUrl  := GITHUB_RAW . "ReiGokil.ahk"
+    local localVersionFile := A_ScriptDir "\version_local.txt"
+    local tempVersion := A_Temp "\rei_version.txt"
+    local tempScript  := A_Temp "\rei_new.ahk"
+
+    ; Download version.txt dari GitHub
+    try {
+        Download(versionUrl, tempVersion)
+        local newVersion := Trim(FileRead(tempVersion, "UTF-8"))
+    } catch {
+        ; Gagal download version.txt → lewati update (koneksi mati / salah URL)
+        return
+    }
+
+    ; Baca versi lokal (jika ada)
+    local currentVersion := ""
+    if FileExist(localVersionFile)
+        currentVersion := Trim(FileRead(localVersionFile, "UTF-8"))
+
+    ; Jika versi berbeda → lakukan update
+    if (newVersion != currentVersion) {
+        ; Download script terbaru
+        try {
+            Download(scriptUrl, tempScript)
+            if !FileExist(tempScript)
+                return
+        } catch {
+            return
+        }
+
+        ; Buat batch file untuk replace script & restart
+        local updater := A_Temp "\rei_update.bat"
+        local batContent := 
+        (LTrim
+            @echo off
+            timeout /t 1 /nobreak >nul
+            del /f /q "`%A_ScriptFullPath`%" 2>nul
+            copy /y "`%tempScript`%" "`%A_ScriptFullPath`%"
+            if exist "`%localVersionFile`%" del "`%localVersionFile`%"
+            echo `%newVersion%` > "`%localVersionFile`%"
+            del "`%tempScript`%" 2>nul
+            start "" "`%A_ScriptFullPath`%"
+            del "`%~f0" 2>nul
+        )
+        FileAppend(batContent, updater, "UTF-8")
+        Run updater, , "Hide"
+        ExitApp()
+    }
+}
+
+; Jalankan auto update (hanya jika script tidak dalam mode update loop)
+if !A_IsCompiled
+    CheckForUpdates()
+
+; ============================================================
+; VARIABLES UTAMA
 ; ============================================================
 global MacroActive  := false
 global ToggleKey    := "F1"
@@ -20,7 +83,7 @@ global UseV := false, UseG := false, UseS := false
 global UseF := false, UseE := false, UseClick := false
 
 ; ============================================================
-; FUNGSI CHECKBOX (CARA AMAN)
+; FUNGSI CHECKBOX
 ; ============================================================
 SetUseZ(ctrl, info) {
     global UseZ
@@ -66,7 +129,7 @@ global RG := Gui("+AlwaysOnTop -DPIScale", "Rei Gokil")
 RG.BackColor := "0A0A0F"
 RG.SetFont("s10 cEEEEEE", "Segoe UI")
 
-; Header tipis
+; Header
 RG.Add("Progress", "x0 y0 w340 h1 Background00CCFF Range0-100", 100)
 
 ; Judul
@@ -148,19 +211,16 @@ ToggleBtn.OnEvent("Click", ToggleMacro)
 ; Footer
 RG.Add("Text", "x0 y292 w340 h1 Background00CCFF")
 RG.SetFont("s7 c555555", "Segoe UI")
-RG.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  minimal")
+RG.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  auto update")
 
 RG.OnEvent("Close", (*) => ExitApp())
 RG.Show("w340 h320")
 
 ; ============================================================
-; HOTKEY (WRAPPER AMAN)
+; HOTKEY SETTING & FUNGSI LAIN
 ; ============================================================
 HotKey(ToggleKey, (*) => ToggleMacro())
 
-; ============================================================
-; FUNGSI SETTING HOTKEY
-; ============================================================
 SetToggleKey(ctrl, info) {
     global IsSettingKey, ToggleKey, KeyLabel, SetKeyBtn
     if IsSettingKey {
@@ -208,9 +268,6 @@ WaitForKey() {
     }
 }
 
-; ============================================================
-; TOGGLE MACRO (UNTUK TOMBOL DAN HOTKEY)
-; ============================================================
 ToggleMacro(ctrl := unset, info := unset) {
     global MacroActive, SkillDelay, CycleDelay, IsSettingKey
     global UseZ,UseX,UseC,UseV,UseG,UseS,UseF,UseE,UseClick
@@ -255,9 +312,6 @@ ToggleMacro(ctrl := unset, info := unset) {
     }
 }
 
-; ============================================================
-; MACRO LOOP
-; ============================================================
 MacroLoop() {
     global MacroActive, SkillDelay, CycleDelay
     global UseZ,UseX,UseC,UseV,UseG,UseS,UseF,UseE,UseClick
