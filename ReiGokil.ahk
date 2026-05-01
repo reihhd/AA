@@ -1,5 +1,5 @@
 ; ============================================================
-;  REI GOKIL - FINAL WORKING
+;  REI GOKIL - FINAL WORKING (FUNGSI DIPERBAIKI)
 ;  https://github.com/reihhd/AA
 ; ============================================================
 
@@ -7,7 +7,7 @@
 #SingleInstance Force
 
 ; ============================================================
-; AUTO-UPDATE (SEDERHANA & AMAN)
+; AUTO-UPDATE (DENGAN BATCH FILE SEDERHANA)
 ; ============================================================
 global GITHUB_RAW := "https://raw.githubusercontent.com/reihhd/AA/refs/heads/main/"
 
@@ -41,9 +41,19 @@ CheckForUpdates() {
             return
         }
         
-        ; Perintah update (tanpa batch file)
-        local cmd := 'cmd /c timeout /t 1 /nobreak >nul & del /f /q "' A_ScriptFullPath '" 2>nul & copy /y "' tempScript '" "' A_ScriptFullPath '" & echo ' newVersion ' > "' localVersionFile '" & start "" "' A_ScriptFullPath '" & del "' tempScript '" 2>nul'
-        Run(cmd, , "Hide")
+        ; Buat batch file untuk update (lebih aman daripada cmd /c panjang)
+        local batFile := A_Temp "\rei_update.bat"
+        local batContent := '@echo off' "`n"
+        batContent .= 'timeout /t 1 /nobreak >nul' "`n"
+        batContent .= 'del /f /q "' A_ScriptFullPath '" 2>nul' "`n"
+        batContent .= 'copy /y "' tempScript '" "' A_ScriptFullPath '"' "`n"
+        batContent .= 'echo ' newVersion ' > "' localVersionFile '"' "`n"
+        batContent .= 'start "" "' A_ScriptFullPath '"' "`n"
+        batContent .= 'del "' tempScript '" 2>nul' "`n"
+        batContent .= 'del "' batFile '" 2>nul'
+        
+        FileAppend(batContent, batFile, "UTF-8")
+        Run batFile, , "Hide"
         ExitApp()
     }
 }
@@ -59,22 +69,55 @@ global IsSettingKey := false
 global SkillDelay   := 100
 global CycleDelay   := 100
 
-global UseZ := false, UseX := false, UseC := false
-global UseV := false, UseG := false, UseS := false
-global UseF := false, UseE := false, UseClick := false
+global UseZ := false
+global UseX := false
+global UseC := false
+global UseV := false
+global UseG := false
+global UseS := false
+global UseF := false
+global UseE := false
+global UseClick := false
 
 ; ============================================================
-; FUNGSI CHECKBOX
+; FUNGSI CHECKBOX (DITULIS EKSPLISIT)
 ; ============================================================
-SetUseZ(ctrl, info) { global UseZ := ctrl.Value }
-SetUseX(ctrl, info) { global UseX := ctrl.Value }
-SetUseC(ctrl, info) { global UseC := ctrl.Value }
-SetUseV(ctrl, info) { global UseV := ctrl.Value }
-SetUseG(ctrl, info) { global UseG := ctrl.Value }
-SetUseS(ctrl, info) { global UseS := ctrl.Value }
-SetUseF(ctrl, info) { global UseF := ctrl.Value }
-SetUseE(ctrl, info) { global UseE := ctrl.Value }
-SetUseClick(ctrl, info) { global UseClick := ctrl.Value }
+SetUseZ(ctrl, info) {
+    global UseZ
+    UseZ := ctrl.Value
+}
+SetUseX(ctrl, info) {
+    global UseX
+    UseX := ctrl.Value
+}
+SetUseC(ctrl, info) {
+    global UseC
+    UseC := ctrl.Value
+}
+SetUseV(ctrl, info) {
+    global UseV
+    UseV := ctrl.Value
+}
+SetUseG(ctrl, info) {
+    global UseG
+    UseG := ctrl.Value
+}
+SetUseS(ctrl, info) {
+    global UseS
+    UseS := ctrl.Value
+}
+SetUseF(ctrl, info) {
+    global UseF
+    UseF := ctrl.Value
+}
+SetUseE(ctrl, info) {
+    global UseE
+    UseE := ctrl.Value
+}
+SetUseClick(ctrl, info) {
+    global UseClick
+    UseClick := ctrl.Value
+}
 
 ; ============================================================
 ; GUI MINIMALIS
@@ -83,7 +126,6 @@ gui := Gui("+AlwaysOnTop -DPIScale", "Rei Gokil")
 gui.BackColor := "0A0A0F"
 gui.SetFont("s10 cEEEEEE", "Segoe UI")
 
-; Header
 gui.Add("Progress", "x0 y0 w340 h1 Background00CCFF Range0-100", 100)
 gui.SetFont("s13 cFFFFFF Bold", "Segoe UI")
 gui.Add("Text", "x20 y16", "REI GOKIL")
@@ -93,7 +135,9 @@ gui.Add("Text", "x0 y50 w340 h1 Background1A1A2A")
 
 ; Checkbox grid
 cbWidth := 80
-x1 := 25, x2 := 125, x3 := 225
+x1 := 25
+x2 := 125
+x3 := 225
 yStart := 70
 rowH := 32
 
@@ -157,6 +201,9 @@ gui.Show("w340 h320")
 ; ============================================================
 HotKey(ToggleKey, (*) => ToggleMacro())
 
+; ============================================================
+; FUNGSI LAINNYA
+; ============================================================
 SetToggleKey(ctrl, info) {
     global IsSettingKey, ToggleKey, keyLabel, setKeyBtn
     if IsSettingKey {
@@ -256,14 +303,22 @@ MacroLoop() {
         return
 
     keys := []
-    if UseZ keys.Push("z")
-    if UseX keys.Push("x")
-    if UseC keys.Push("c")
-    if UseV keys.Push("v")
-    if UseG keys.Push("g")
-    if UseS keys.Push("s")
-    if UseF keys.Push("f")
-    if UseE keys.Push("e")
+    if UseZ
+        keys.Push("z")
+    if UseX
+        keys.Push("x")
+    if UseC
+        keys.Push("c")
+    if UseV
+        keys.Push("v")
+    if UseG
+        keys.Push("g")
+    if UseS
+        keys.Push("s")
+    if UseF
+        keys.Push("f")
+    if UseE
+        keys.Push("e")
 
     for k in keys {
         if !MacroActive
