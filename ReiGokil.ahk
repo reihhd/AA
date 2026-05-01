@@ -229,7 +229,7 @@ ToggleMacro(ctrl := unset, info := unset) {
         ToggleBtn.Text := "||  STOP  [ " ToggleKey " ]"
         SetTimer(MacroLoop, 50)
     } else {
-        StatusTxt.Text := "STANDBY"
+        StatusTxt.Text := "READY"
         StatusTxt.SetFont("cAAAAAA")
         ToggleBtn.Text := ">>  START  [ " ToggleKey " ]"
         SetTimer(MacroLoop, 0)
