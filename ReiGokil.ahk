@@ -67,7 +67,7 @@ MyGui.Add("Progress", "x0 y0 w340 h1 Background00CCFF Range0-100", 100)
 MyGui.SetFont("s13 cFFFFFF Bold", "Segoe UI")
 MyGui.Add("Text", "x20 y16", "REI GOKIL")
 MyGui.SetFont("s8 cAAAAAA", "Segoe UI")
-global StatusTxt := MyGui.Add("Text", "x220 y20 w100 h28 +0x200 Background151520 Center", "STANDBY")
+global StatusTxt := MyGui.Add("Text", "x220 y20 w100 h28 +0x200 Background151520 Center", "READY")
 MyGui.Add("Text", "x0 y50 w340 h1 Background1A1A2A")
 
 ; Checkbox grid
