@@ -1,5 +1,5 @@
 ; ============================================================
-;  REI GOKIL - MAIN SCRIPT (WORKING)
+;  REI GOKIL - FINAL WORKING (NO GUI ERROR)
 ;  https://github.com/reihhd/AA
 ; ============================================================
 
@@ -9,136 +9,124 @@
 ; ============================================================
 ; VARIABLES
 ; ============================================================
-MacroActive := false
-ToggleKey := "F1"
-IsSettingKey := false
-SkillDelay := 100
-CycleDelay := 100
+global MacroActive  := false
+global ToggleKey    := "F1"
+global IsSettingKey := false
+global SkillDelay   := 100
+global CycleDelay   := 100
 
-UseZ := false
-UseX := false
-UseC := false
-UseV := false
-UseG := false
-UseS := false
-UseF := false
-UseE := false
-UseClick := false
+global UseZ := false
+global UseX := false
+global UseC := false
+global UseV := false
+global UseG := false
+global UseS := false
+global UseF := false
+global UseE := false
+global UseClick := false
 
 ; ============================================================
 ; FUNGSI CHECKBOX
 ; ============================================================
 SetUseZ(ctrl, info) {
-    global UseZ
-    UseZ := ctrl.Value
+    global UseZ := ctrl.Value
 }
 SetUseX(ctrl, info) {
-    global UseX
-    UseX := ctrl.Value
+    global UseX := ctrl.Value
 }
 SetUseC(ctrl, info) {
-    global UseC
-    UseC := ctrl.Value
+    global UseC := ctrl.Value
 }
 SetUseV(ctrl, info) {
-    global UseV
-    UseV := ctrl.Value
+    global UseV := ctrl.Value
 }
 SetUseG(ctrl, info) {
-    global UseG
-    UseG := ctrl.Value
+    global UseG := ctrl.Value
 }
 SetUseS(ctrl, info) {
-    global UseS
-    UseS := ctrl.Value
+    global UseS := ctrl.Value
 }
 SetUseF(ctrl, info) {
-    global UseF
-    UseF := ctrl.Value
+    global UseF := ctrl.Value
 }
 SetUseE(ctrl, info) {
-    global UseE
-    UseE := ctrl.Value
+    global UseE := ctrl.Value
 }
 SetUseClick(ctrl, info) {
-    global UseClick
-    UseClick := ctrl.Value
+    global UseClick := ctrl.Value
 }
 
 ; ============================================================
-; GUI
+; GUI (GUNAKAN NAMA VARIABEL MyGui)
 ; ============================================================
 MyGui := Gui("+AlwaysOnTop -DPIScale", "Rei Gokil")
 MyGui.BackColor := "0A0A0F"
 MyGui.SetFont("s10 cEEEEEE", "Segoe UI")
 
-; Header
 MyGui.Add("Progress", "x0 y0 w340 h1 Background00CCFF Range0-100", 100)
 MyGui.SetFont("s13 cFFFFFF Bold", "Segoe UI")
 MyGui.Add("Text", "x20 y16", "REI GOKIL")
 MyGui.SetFont("s8 cAAAAAA", "Segoe UI")
-StatusTxt := MyGui.Add("Text", "x220 y20 w100 h28 +0x200 Background151520 Center", "STANDBY")
+global StatusTxt := MyGui.Add("Text", "x220 y20 w100 h28 +0x200 Background151520 Center", "STANDBY")
 MyGui.Add("Text", "x0 y50 w340 h1 Background1A1A2A")
 
 ; Checkbox grid
 cbWidth := 80
-x1 := 25
-x2 := 125
-x3 := 225
+x1 := 25, x2 := 125, x3 := 225
 yStart := 70
 rowH := 32
 
 MyGui.SetFont("s10 cDDDDDD", "Segoe UI")
-cbZ := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart, cbWidth), "Z")
-cbX := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart, cbWidth), "X")
-cbC := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart, cbWidth), "C")
-cbV := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH, cbWidth), "V")
-cbG := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH, cbWidth), "G")
-cbS := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH, cbWidth), "S")
+global CbZ := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart, cbWidth), "Z")
+global CbX := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart, cbWidth), "X")
+global CbC := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart, cbWidth), "C")
+global CbV := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH, cbWidth), "V")
+global CbG := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH, cbWidth), "G (ULTIMATE)")
+global CbS := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH, cbWidth), "S")
 MyGui.SetFont("s10 cFFAA44", "Segoe UI")
-cbF := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH*2, cbWidth), "F")
+global CbF := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH*2, cbWidth), "F")
 MyGui.SetFont("s10 c66FF66", "Segoe UI")
-cbE := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH*2, cbWidth), "E")
+global CbE := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH*2, cbWidth), "E")
 MyGui.SetFont("s10 c66AAFF", "Segoe UI")
-cbClick := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH*2, cbWidth), "CLICK")
+global CbClick := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH*2, cbWidth), "CLICK")
 
 ; Events
-cbZ.OnEvent("Click", SetUseZ)
-cbX.OnEvent("Click", SetUseX)
-cbC.OnEvent("Click", SetUseC)
-cbV.OnEvent("Click", SetUseV)
-cbG.OnEvent("Click", SetUseG)
-cbS.OnEvent("Click", SetUseS)
-cbF.OnEvent("Click", SetUseF)
-cbE.OnEvent("Click", SetUseE)
-cbClick.OnEvent("Click", SetUseClick)
+CbZ.OnEvent("Click", SetUseZ)
+CbX.OnEvent("Click", SetUseX)
+CbC.OnEvent("Click", SetUseC)
+CbV.OnEvent("Click", SetUseV)
+CbG.OnEvent("Click", SetUseG)
+CbS.OnEvent("Click", SetUseS)
+CbF.OnEvent("Click", SetUseF)
+CbE.OnEvent("Click", SetUseE)
+CbClick.OnEvent("Click", SetUseClick)
 
 ; Delay controls
 MyGui.SetFont("s8 c888888", "Segoe UI")
 MyGui.Add("Text", "x20 y176", "DELAY")
-SkillDelayEdit := MyGui.Add("Edit", "x70 y173 w50 h20 Center", "100")
+global SkillDelayEdit := MyGui.Add("Edit", "x70 y173 w50 h20 Center", "100")
 MyGui.Add("UpDown", "Range10-500", 100)
 MyGui.Add("Text", "x135 y176", "ms")
 MyGui.Add("Text", "x190 y176", "LOOP")
-CycleDelayEdit := MyGui.Add("Edit", "x235 y173 w50 h20 Center", "100")
+global CycleDelayEdit := MyGui.Add("Edit", "x235 y173 w50 h20 Center", "100")
 MyGui.Add("UpDown", "Range10-5000", 100)
 MyGui.Add("Text", "x295 y176", "ms")
 
 ; Hotkey setter
 MyGui.Add("Text", "x20 y208", "TOGGLE")
-KeyLabel := MyGui.Add("Text", "x80 y205 w60 h22 +0x200 Background151520 Center", "F1")
-SetKeyBtn := MyGui.Add("Button", "x150 y205 w60 h22", "SET")
+global KeyLabel := MyGui.Add("Text", "x80 y205 w60 h22 +0x200 Background151520 Center", "F1")
+global SetKeyBtn := MyGui.Add("Button", "x150 y205 w60 h22", "SET")
 SetKeyBtn.OnEvent("Click", SetToggleKey)
 
 ; Start/Stop button
 MyGui.SetFont("s10 cFFFFFF Bold", "Segoe UI")
-ToggleBtn := MyGui.Add("Button", "x20 y245 w300 h32", ">>  START  [ F1 ]")
+global ToggleBtn := MyGui.Add("Button", "x20 y245 w300 h32", ">>  START  [ F1 ]")
 ToggleBtn.OnEvent("Click", ToggleMacro)
 
 ; Footer
 MyGui.Add("Text", "x0 y292 w340 h1 Background00CCFF")
 MyGui.SetFont("s7 c555555", "Segoe UI")
-MyGui.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  loader based")
+MyGui.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  auto update")
 
 MyGui.OnEvent("Close", (*) => ExitApp())
 MyGui.Show("w340 h320")
@@ -149,7 +137,7 @@ MyGui.Show("w340 h320")
 HotKey(ToggleKey, (*) => ToggleMacro())
 
 ; ============================================================
-; FUNGSI LAIN
+; FUNGSI LAINNYA
 ; ============================================================
 SetToggleKey(ctrl, info) {
     global IsSettingKey, ToggleKey, KeyLabel, SetKeyBtn
