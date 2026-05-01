@@ -129,7 +129,7 @@ SetKeyBtn.OnEvent("Click", SetToggleKey)
 
 ; Start/Stop button
 MyGui.SetFont("s10 cFFFFFF Bold", "Segoe UI")
-global ToggleBtn := MyGui.Add("Button", "x20 y245 w300 h32", ">>  START  [ F1 ]")
+global ToggleBtn := MyGui.Add("Button", "x20 y245 w300 h32", "Start/Stop")
 ToggleBtn.OnEvent("Click", ToggleMacro)
 
 ; Footer
