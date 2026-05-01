@@ -1,5 +1,5 @@
 ; ============================================================
-;  REI GOKIL - MINIMALIS + AUTO UPDATE
+;  REI GOKIL - MINIMALIS + AUTO UPDATE (FIXED)
 ;  AutoHotkey v2
 ;  https://github.com/reihhd/AA
 ; ============================================================
@@ -8,7 +8,7 @@
 #Requires AutoHotkey v2.0
 
 ; ============================================================
-; AUTO-UPDATE (CEPAT & AMAN)
+; AUTO-UPDATE (TANPA BATCH, AMAN)
 ; ============================================================
 
 global GITHUB_RAW := "https://raw.githubusercontent.com/reihhd/AA/refs/heads/main/"
@@ -20,23 +20,21 @@ CheckForUpdates() {
     local tempVersion := A_Temp "\rei_version.txt"
     local tempScript  := A_Temp "\rei_new.ahk"
 
-    ; Download version.txt dari GitHub
+    ; Download version.txt
     try {
         Download(versionUrl, tempVersion)
         local newVersion := Trim(FileRead(tempVersion, "UTF-8"))
     } catch {
-        ; Gagal download version.txt → lewati update (koneksi mati / salah URL)
         return
     }
 
-    ; Baca versi lokal (jika ada)
+    ; Baca versi lokal
     local currentVersion := ""
     if FileExist(localVersionFile)
         currentVersion := Trim(FileRead(localVersionFile, "UTF-8"))
 
-    ; Jika versi berbeda → lakukan update
+    ; Jika versi beda, update
     if (newVersion != currentVersion) {
-        ; Download script terbaru
         try {
             Download(scriptUrl, tempScript)
             if !FileExist(tempScript)
@@ -45,27 +43,14 @@ CheckForUpdates() {
             return
         }
 
-        ; Buat batch file untuk replace script & restart
-        local updater := A_Temp "\rei_update.bat"
-        local batContent := 
-        (LTrim
-            @echo off
-            timeout /t 1 /nobreak >nul
-            del /f /q "`%A_ScriptFullPath`%" 2>nul
-            copy /y "`%tempScript`%" "`%A_ScriptFullPath`%"
-            if exist "`%localVersionFile`%" del "`%localVersionFile`%"
-            echo `%newVersion%` > "`%localVersionFile`%"
-            del "`%tempScript`%" 2>nul
-            start "" "`%A_ScriptFullPath`%"
-            del "`%~f0" 2>nul
-        )
-        FileAppend(batContent, updater, "UTF-8")
-        Run updater, , "Hide"
+        ; Gunakan cmd /c untuk copy dan restart (tanpa file batch terpisah)
+        local cmdLine := 'cmd /c timeout /t 1 /nobreak >nul & del /f /q "' A_ScriptFullPath '" 2>nul & copy /y "' tempScript '" "' A_ScriptFullPath '" & echo ' newVersion ' > "' localVersionFile '" & start "" "' A_ScriptFullPath '" & del "' tempScript '" 2>nul'
+        Run(cmdLine, , "Hide")
         ExitApp()
     }
 }
 
-; Jalankan auto update (hanya jika script tidak dalam mode update loop)
+; Jalankan auto update jika bukan mode kompilasi
 if !A_IsCompiled
     CheckForUpdates()
 
@@ -86,40 +71,31 @@ global UseF := false, UseE := false, UseClick := false
 ; FUNGSI CHECKBOX
 ; ============================================================
 SetUseZ(ctrl, info) {
-    global UseZ
-    UseZ := ctrl.Value
+    global UseZ := ctrl.Value
 }
 SetUseX(ctrl, info) {
-    global UseX
-    UseX := ctrl.Value
+    global UseX := ctrl.Value
 }
 SetUseC(ctrl, info) {
-    global UseC
-    UseC := ctrl.Value
+    global UseC := ctrl.Value
 }
 SetUseV(ctrl, info) {
-    global UseV
-    UseV := ctrl.Value
+    global UseV := ctrl.Value
 }
 SetUseG(ctrl, info) {
-    global UseG
-    UseG := ctrl.Value
+    global UseG := ctrl.Value
 }
 SetUseS(ctrl, info) {
-    global UseS
-    UseS := ctrl.Value
+    global UseS := ctrl.Value
 }
 SetUseF(ctrl, info) {
-    global UseF
-    UseF := ctrl.Value
+    global UseF := ctrl.Value
 }
 SetUseE(ctrl, info) {
-    global UseE
-    UseE := ctrl.Value
+    global UseE := ctrl.Value
 }
 SetUseClick(ctrl, info) {
-    global UseClick
-    UseClick := ctrl.Value
+    global UseClick := ctrl.Value
 }
 
 ; ============================================================
@@ -129,23 +105,14 @@ global RG := Gui("+AlwaysOnTop -DPIScale", "Rei Gokil")
 RG.BackColor := "0A0A0F"
 RG.SetFont("s10 cEEEEEE", "Segoe UI")
 
-; Header
 RG.Add("Progress", "x0 y0 w340 h1 Background00CCFF Range0-100", 100)
-
-; Judul
 RG.SetFont("s13 cFFFFFF Bold", "Segoe UI")
 RG.Add("Text", "x20 y16", "REI GOKIL")
-
-; Status
 RG.SetFont("s8 cAAAAAA", "Segoe UI")
 global StatusTxt := RG.Add("Text", "x220 y20 w100 h28 +0x200 Background151520 Center", "STANDBY")
-
-; Divider
 RG.Add("Text", "x0 y50 w340 h1 Background1A1A2A")
 
-; ============================================================
-; CHECKBOX GRID
-; ============================================================
+; Checkbox
 cbWidth := 80
 x1 := 25, x2 := 125, x3 := 225
 yStart := 70
@@ -155,11 +122,9 @@ RG.SetFont("s10 cDDDDDD", "Segoe UI")
 global CbZ := RG.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart, cbWidth), "Z")
 global CbX := RG.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart, cbWidth), "X")
 global CbC := RG.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart, cbWidth), "C")
-
 global CbV := RG.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH, cbWidth), "V")
 global CbG := RG.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH, cbWidth), "G")
 global CbS := RG.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH, cbWidth), "S")
-
 RG.SetFont("s10 cFFAA44", "Segoe UI")
 global CbF := RG.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH*2, cbWidth), "F")
 RG.SetFont("s10 c66FF66", "Segoe UI")
@@ -167,7 +132,6 @@ global CbE := RG.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH*2, cb
 RG.SetFont("s10 c66AAFF", "Segoe UI")
 global CbClick := RG.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH*2, cbWidth), "CLICK")
 
-; Bind events
 CbZ.OnEvent("Click", SetUseZ)
 CbX.OnEvent("Click", SetUseX)
 CbC.OnEvent("Click", SetUseC)
@@ -178,32 +142,24 @@ CbF.OnEvent("Click", SetUseF)
 CbE.OnEvent("Click", SetUseE)
 CbClick.OnEvent("Click", SetUseClick)
 
-; ============================================================
-; DELAY SETTING
-; ============================================================
+; Delay
 RG.SetFont("s8 c888888", "Segoe UI")
 RG.Add("Text", "x20 y176", "DELAY")
 global SkillDelayEdit := RG.Add("Edit", "x70 y173 w50 h20 Center", "100")
 RG.Add("UpDown", "Range10-500", 100)
 RG.Add("Text", "x135 y176", "ms")
-
 RG.Add("Text", "x190 y176", "LOOP")
 global CycleDelayEdit := RG.Add("Edit", "x235 y173 w50 h20 Center", "100")
 RG.Add("UpDown", "Range10-5000", 100)
 RG.Add("Text", "x295 y176", "ms")
 
-; ============================================================
-; HOTKEY SETTER
-; ============================================================
-RG.SetFont("s8 c888888", "Segoe UI")
+; Hotkey
 RG.Add("Text", "x20 y208", "TOGGLE")
 global KeyLabel := RG.Add("Text", "x80 y205 w60 h22 +0x200 Background151520 Center", "F1")
 global SetKeyBtn := RG.Add("Button", "x150 y205 w60 h22", "SET")
 SetKeyBtn.OnEvent("Click", SetToggleKey)
 
-; ============================================================
-; TOMBOL START/STOP
-; ============================================================
+; Start button
 RG.SetFont("s10 cFFFFFF Bold", "Segoe UI")
 global ToggleBtn := RG.Add("Button", "x20 y245 w300 h32", ">>  START  [ F1 ]")
 ToggleBtn.OnEvent("Click", ToggleMacro)
@@ -217,7 +173,7 @@ RG.OnEvent("Close", (*) => ExitApp())
 RG.Show("w340 h320")
 
 ; ============================================================
-; HOTKEY SETTING & FUNGSI LAIN
+; HOTKEY
 ; ============================================================
 HotKey(ToggleKey, (*) => ToggleMacro())
 
