@@ -135,7 +135,7 @@ ToggleBtn.OnEvent("Click", ToggleMacro)
 ; Footer
 MyGui.Add("Text", "x0 y292 w340 h1 Background00CCFF")
 MyGui.SetFont("s7 c555555", "Segoe UI")
-MyGui.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  auto update")
+MyGui.Add("Text", "x0 y300 w340 h18 Center", "rei gokil  |  1.0.0")
 
 MyGui.OnEvent("Close", (*) => ExitApp())
 MyGui.Show("w340 h320")
