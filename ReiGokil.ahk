@@ -12,7 +12,7 @@
 global MacroActive  := false
 global ToggleKey    := "F1"
 global IsSettingKey := false
-global SkillDelay   := 100
+global SkillDelay   := 10
 global CycleDelay   := 100
 
 global UseZ := false
@@ -81,7 +81,7 @@ global CbZ := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart, cbWidt
 global CbX := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart, cbWidth), "X")
 global CbC := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart, cbWidth), "C")
 global CbV := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH, cbWidth), "V")
-global CbG := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH, cbWidth), "G (ULTIMATE)")
+global CbG := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x2, yStart+rowH, cbWidth), "G")
 global CbS := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x3, yStart+rowH, cbWidth), "S")
 MyGui.SetFont("s10 cFFAA44", "Segoe UI")
 global CbF := MyGui.Add("CheckBox", Format("x{} y{} w{} h25", x1, yStart+rowH*2, cbWidth), "F")
