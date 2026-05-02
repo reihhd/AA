@@ -149,7 +149,7 @@ ToggleBtn.OnEvent("Click", ToggleMacro)
 
 MyGui.Add("Text", "x0 y332 w340 h1 Background00CCFF")
 MyGui.SetFont("s7 c333344", "Segoe UI")
-MyGui.Add("Text", "x0 y340 w340 h18 Center", "rei  |  1.0.1")
+MyGui.Add("Text", "x0 y340 w340 h18 Center", "rei  |  1.0.2")
 
 MyGui.OnEvent("Close", (*) => ExitApp())
 MyGui.Show("w340 h360")
